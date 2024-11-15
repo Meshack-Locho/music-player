@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body{
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+        .container{
+            background: linear-gradient(0.25turn, rgb(0, 110, 255), rgb(137, 0, 216));
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .container-image{
+            position: absolute;
+            left: 0;
+            right: 0;
+            filter: brightness(30%) blur(4px);
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            object-position: center;
+        }
+        .inner-container{
+            width: 70vw;
+            height: 100vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 100px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
+            
+        }
+        .repeat-shuffle{
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        .progress {
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(0.25turn, #5cd5eb, purple);
+            cursor: pointer;
+            width: 50vw;
+            border-radius: 10px;
+            position: relative;
+        }
+        .progress::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Override default look */
+            appearance: none;
+            background-color: #5cd5eb;
+            height: 0.8rem;
+            width: 0.8rem; 
+            border-radius: 50%; 
+            box-shadow: 0px 0px 10px 10px #05daff;  
+        }
+        #vol{
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(0.25turn, #5cd5eb, purple);
+            cursor: pointer;
+            width: 100%;
+            border-radius: 10px;
+            position: relative; 
+        }
+        #vol::-webkit-slider-thumb{
+            -webkit-appearance: none; /* Override default look */
+            appearance: none;
+            background-color: #5cd5eb;
+            height: 0.8rem;
+            width: 0.8rem; 
+            border-radius: 50%; 
+            box-shadow: 0px 0px 10px 10px #05daff;  
+        }
+
+        .controls{
+            width: 70vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+        }
+        .controls1{
+            width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+
+        }
+        .controls i{
+            font-size: 30px;
+            cursor: pointer;
+            background-color: rgb(0, 119, 255);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: rgb(167, 247, 187);
+        }
+        .music-image{
+            border-radius: 50%;
+            border: 1px solid black;
+            max-width: 350px;
+            object-fit: cover;
+        }
+        .music-name{
+            width: 70vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(00.25turn, #17ff49, rgb(3, 184, 144));
+            position: relative;
+            
+        }
+        #new-audio{
+            position: absolute;
+            left: 0;
+            top: 0;
+            animation: slide 30s infinite linear forwards;
+        }
+        @keyframes slide{
+            from{
+                left: 0;
+
+            }
+            to{
+                left: 110%;
+            }
+        }
+        ::-webkit-file-upload-button{
+            appearance: none;
+            display: none;
+        }
+        .stop-message{
+            position: absolute;
+            left: 35%;
+            right: 50%;
+            bottom: 100px;
+            background-color: rgb(0, 110, 255);
+            width: 350px;
+            text-align: center;
+            color: white;
+            opacity: 0.7;
+            transition-duration: 2s;
+        }
+        .stop-message.inactive{
+           visibility: hidden;
+        }
+        .volume-section{
+            width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .volume{
+            width: 50px;
+            border: none;
+            padding: 10px;
+            background-color: rgb(0, 110, 255);
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .volume:active{
+            scale: 1.1;
+        }
+        @media (max-width: 900px){
+            .music-image{
+                width: 280px;
+                height: 280px;
+            }
+            .controls{
+                gap: 20px;
+            }
+            .stop-message{
+                left: 20%;
+                bottom: 200px;
+                width: 60vw;
+            }
+            
+        }
+        .image-selector{
+            position: relative;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fa-camera{
+             position: absolute;
+             left: 60px;
+             top: 40px;
+             font-size: 30px;
+             color: rgb(34, 152, 255);
+       }
+       .instruction1{
+            width: 200px;
+            position: absolute;
+            left: 60px;
+            top: 80px;
+            background-color: rgb(0, 110, 255);
+            padding: 10px;
+       }
+       .instruction1.inactive{
+            display: none;
+       }
+       .instruction2{
+            width: 200px;
+            position: absolute;
+            right: -80px;
+            top: 50px;
+            background-color: rgb(0, 110, 255);
+            padding: 10px;
+       }
+       .instruction2.inactive{
+            display: none;
+       }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="" alt="" class="container-image">
+        <div class="inner-container">
+            <div class="image-selector">
+                <img src="my logo.png" alt="" width="350px" height="350px" class="music-image">
+               <label for="new-image" style="cursor: pointer;" title="Click here to change image"><i class="fa-solid fa-camera"></i></label>
+               <h4 class="instruction1">Click here to change image <i class="fa-solid fa-hand-pointer"></i></h4>
+                <input type="file" name="image" id="new-image" style="display: none;">
+            </div>
+            <div class="repeat-shuffle">
+                <span class="repeat" title="Toggle Loop"><i class="fa-solid fa-repeat"></i></span>
+                <span class="new-song">
+                    <label for="new-audio" style="width: 40px;height: 40px; background: red;padding: 5px;cursor: pointer;color: white;font-family: sans-serif;border-radius: 10px;" title="Click here to select Track"><i class="fa-solid fa-music"></i> Song</label>
+                </span>
+                <h4 class="instruction2">Click here to change Track <i class="fa-solid fa-hand-pointer"></i></h4>
+            </div>
+            <h4 class="music-name"><input type="file" name="audio" id="new-audio"></h4>
+            <div class="song-progress">
+                <p class="song-time">00:00</p>
+                <input type="range" class="progress">
+            </div>
+            <div class="controls">
+                <div class="controls1">
+                    <span class="backwards"><i class="fa-solid fa-backward"></i></span>
+                    <span><i class="fa-solid fa-play"></i></span>
+                    <span class="forwards"><i class="fa-solid fa-forward"></i></span>
+                    <span class="stop"><i class="fa-solid fa-stop"></i></span>
+                </div>
+                <div class="volume-section">
+                    <input type="range" id="vol">
+                </div>
+                
+            </div>
+
+            <h5 class="stop-message inactive">Press stop to choose another song from your files</h5>
+        </div>
+    </div>
+
+    <script>
+        let containerImage = document.querySelector(".container-image")
+        let firstInstruction = document.querySelector(".instruction1")
+        let secondInstruction = document.querySelector(".instruction2")
+        let addAudio = document.getElementById("new-audio")
+        let musicName = document.querySelector(".music-name")
+        let playerKey = document.querySelector(".fa-play")
+        let forwardBtn = document.querySelector(".forwards")
+        let backwardBtn = document.querySelector(".backwards")
+        let camera = document.querySelector(".fa-camera")
+        let musicImage = document.querySelector(".music-image")
+        let imageSelection = document.getElementById("new-image")
+        let playlist = []
+        let progressBar = document.querySelector(".progress")
+        progressBar.value = 0
+        let stopBtn = document.querySelector(".fa-stop")
+        let repeatBtn = document.querySelector(".repeat")
+        let stopMessage = document.querySelector(".stop-message")
+        let volumeBar = document.getElementById("volume-bar")
+        let addBtn = document.querySelector(".add")
+        let minusBtn = document.querySelector(".minus")
+        let music
+        let songTime = document.querySelector(".song-time")
+        let h = 0
+        let m = 0
+        let s = 0
+        let volRange = document.getElementById("vol")
+        volRange.value = 20
+        
+
+        window.addEventListener("click", ()=>{
+            firstInstruction.classList.add("inactive")
+            secondInstruction.classList.add("inactive")
+        })
+        
+        addAudio.addEventListener("change", ()=>{
+            music = URL.createObjectURL(addAudio.files[0])
+            let createMusic = document.createElement("audio")
+            createMusic.playing = false
+            createMusic.src = music
+            
+            playerKey.classList.add("fa-play")
+            playlist.push(createMusic)
+            currentTime = 0
+            let isPaused = false
+            progressBar.value = createMusic.currentTime
+            function playingFunc() {
+                createMusic.volume = volRange.value / 100
+                m = Math.floor(createMusic.currentTime / 60)
+                s = Math.floor(createMusic.currentTime - m * 60)
+                if (s < 10) {s = "0" + s}
+                if (m < 10) {m = "0" + m}
+                songTime.textContent = m + ":" + s
+                let interval = setInterval(()=>{
+                        if (createMusic.currentTime != createMusic.duration && !isPaused) {
+                            progressBar.value = createMusic.currentTime
+                        }
+                       
+                        playingFunc()
+                    }, 1000)
+
+                    progressBar.addEventListener("change", ()=>{
+                    createMusic.currentTime  = progressBar.value
+                    progressBar.setAttribute("max", createMusic.duration)
+                })
+                
+                volRange.addEventListener("change", ()=>{
+                   createMusic.volume = volRange.value / 100
+                })                
+            }
+
+            forwardBtn.addEventListener("click", ()=>{
+                createMusic.currentTime += 20
+            })
+            backwardBtn.addEventListener("click", ()=>{
+                createMusic.currentTime -= 20
+            })
+
+            playerKey.addEventListener("click", ()=>{
+                if (playerKey.classList.contains("fa-play")) {
+                    playerKey.classList.remove("fa-play")
+                    playerKey.classList.add("fa-pause")
+                    createMusic.play()
+                    playingFunc()
+                    isPaused = false
+                }else{
+                    playerKey.classList.add("fa-play")
+                    playerKey.classList.remove("fa-pause")
+                    createMusic.pause()
+                    isPaused = true
+                }
+
+        })
+        stopBtn.addEventListener("click", ()=>{
+          window.location.reload(true)
+        })
+
+        repeatBtn.addEventListener("click", ()=>{
+            repeatBtn.classList.toggle("repeatOn")
+            if (repeatBtn.classList.contains("repeatOn")) {
+                repeatBtn.style.color = "red"
+                repeatBtn.style.fontSize = "20px"
+                createMusic.setAttribute("loop", "loop")
+                stopMessage.classList.remove("inactive")
+                stopMessage.textContent = "Repeat On"
+                setTimeout(()=>{
+                 stopMessage.classList.add("inactive")
+                }, 2000)
+            }else{
+                repeatBtn.style.color = "black"
+                repeatBtn.style.fontSize = "15px"
+                stopMessage.classList.remove("inactive")
+                createMusic.loop = false
+                stopMessage.textContent = "Repeat Off"
+                setTimeout(()=>{
+                 stopMessage.classList.add("inactive")
+                }, 2000)
+                playerKey.classList.add("fa-play")
+            }
+
+        })
+        if (playerKey.classList.contains("fa-pause")) {
+                stopMessage.classList.remove("inactive")
+                stopMessage.textContent = "Press stop button to choose another track"
+                setTimeout(()=>{
+                 stopMessage.classList.add("inactive")
+                }, 2000)
+                alert("Click, the stop button to stop th existing track first")
+            
+
+            }
+
+    })
+
+
+    imageSelection.addEventListener("change", ()=>{
+        let image = URL.createObjectURL(imageSelection.files[0])
+        musicImage.src = image
+        containerImage.src = image
+    })
+    </script>
+</body>
+</html>
